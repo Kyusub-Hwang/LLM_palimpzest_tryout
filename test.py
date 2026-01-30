@@ -30,6 +30,6 @@ emails = emails.sem_map([
 
 # execute the program and print the output
 output = emails.run(max_quality=True, config=pz.QueryProcessorConfig(
-    available_models=[Model.OLLAMA_GPT_5_MINI_LOCAL]))
+    available_models=[Model.OLLAMA_GPT_5_MINI_LOCAL]), execution_strategy="parallel")
 
 print(output.to_df(cols=["filename", "sender", "subject", "summary"]))
