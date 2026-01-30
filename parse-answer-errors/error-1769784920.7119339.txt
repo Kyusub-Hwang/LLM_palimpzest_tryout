@@ -1,0 +1,21 @@
+ollama/llama3.1
+#####
+PromptStrategy.FILTER
+#####
+To determine if the email refers to any of the specified business transactions, we need to analyze its content. The email appears to be discussing a meeting related to UAF (Unknown Asset Facility) results for NNG (Natural Gas). It mentions reviewing past results and identifying reasons for losses.
+
+However, there is no mention of "Raptor", "Deathstar", "Chewco", or "Fat Boy" in the provided text. These terms do not seem to be related to the context of the email, which focuses on natural gas measurements and review efforts.
+
+Therefore, based on the given information, we cannot conclude that the email refers to any of these business transactions.
+
+However, it's worth noting that the email does mention "GMS" (Gas Measurement Specialists) and "Regional UAF teams", but without more context or specific details about the projects they are working on, it is not possible to determine if they are related to the specified business transactions.
+#####
+{'passed_operator': FieldInfo(annotation=bool, required=True, description='Whether the record passed the filter operation')}
+#####
+Could not parse answer from completion text: To determine if the email refers to any of the specified business transactions, we need to analyze its content. The email appears to be discussing a meeting related to UAF (Unknown Asset Facility) results for NNG (Natural Gas). It mentions reviewing past results and identifying reasons for losses.
+
+However, there is no mention of "Raptor", "Deathstar", "Chewco", or "Fat Boy" in the provided text. These terms do not seem to be related to the context of the email, which focuses on natural gas measurements and review efforts.
+
+Therefore, based on the given information, we cannot conclude that the email refers to any of these business transactions.
+
+However, it's worth noting that the email does mention "GMS" (Gas Measurement Specialists) and "Regional UAF teams", but without more context or specific details about the projects they are working on, it is not possible to determine if they are related to the specified business transactions.

@@ -1,0 +1,33 @@
+ollama/llama3.1
+#####
+PromptStrategy.FILTER
+#####
+To determine if the email meets the filter condition, we need to analyze its content for any references to the specified business transactions ("Raptor", "Deathstar", "Chewco", and/or "Fat Boy").
+
+Step 1: Review the email's subject line and body for any mentions of these specific terms.
+
+Step 2: Check if there are any attachments or links within the email that might contain relevant information.
+
+Step 3: If none of the above steps yield a match, we can conclude that the email does not meet the filter condition.
+
+
+After reviewing the provided email content:
+
+
+There is no mention of "Raptor", "Deathstar", "Chewco", and/or "Fat Boy" in the email's subject line or body.
+#####
+{'passed_operator': FieldInfo(annotation=bool, required=True, description='Whether the record passed the filter operation')}
+#####
+Could not parse answer from completion text: To determine if the email meets the filter condition, we need to analyze its content for any references to the specified business transactions ("Raptor", "Deathstar", "Chewco", and/or "Fat Boy").
+
+Step 1: Review the email's subject line and body for any mentions of these specific terms.
+
+Step 2: Check if there are any attachments or links within the email that might contain relevant information.
+
+Step 3: If none of the above steps yield a match, we can conclude that the email does not meet the filter condition.
+
+
+After reviewing the provided email content:
+
+
+There is no mention of "Raptor", "Deathstar", "Chewco", and/or "Fat Boy" in the email's subject line or body.

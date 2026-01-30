@@ -1,0 +1,17 @@
+ollama/llama3.1
+#####
+PromptStrategy.FILTER
+#####
+To determine if the text mentions any of the specified business transactions ("Raptor", "Deathstar", "Chewco", and/or "Fat Boy"), we can simply scan the text for these keywords. 
+
+Upon scanning, we find that the text does mention "Chewco" in several places.
+
+Therefore, the answer to the question is: Yes, the text mentions one of the specified business transactions ("Chewco").
+#####
+{'passed_operator': FieldInfo(annotation=bool, required=True, description='Whether the record passed the filter operation')}
+#####
+Could not parse answer from completion text: To determine if the text mentions any of the specified business transactions ("Raptor", "Deathstar", "Chewco", and/or "Fat Boy"), we can simply scan the text for these keywords. 
+
+Upon scanning, we find that the text does mention "Chewco" in several places.
+
+Therefore, the answer to the question is: Yes, the text mentions one of the specified business transactions ("Chewco").
