@@ -1,0 +1,110 @@
+{
+  "nodes": [
+    {
+      "id": "ap-1",
+      "labels": ["Analytical_Pattern"],
+      "properties": {
+        "name": "Retrieve Zurich Temperature AP",
+        "description": "Analytical Pattern to retrieve temperature data for Zurich",
+        "process": "retrieve_temperature",
+        "publishedDate": "2025-06-30",
+        "startTime": "10:00:00"
+      }
+    },
+    {
+      "id": "op-1",
+      "labels": ["API_Operator"],
+      "properties": {
+        "Name": "Weather API Operator",
+        "Description": "Calls a weather API to retrieve temperature data",
+        "endpoint": "https://api.open-meteo.com/v1/forecast",
+        "command": "GET",
+        "queryType": "REST",
+        "Step": 1,
+        "parameters": ["latitude", "longitude", "current_weather"],
+        "PublishedDate": "2025-06-30",
+        "StartTime": "10:00:00"
+      }
+    },
+    {
+      "id": "ds-location",
+      "labels": ["sc:Dataset"],
+      "properties": {
+        "Name": "Zurich Location",
+        "Description": "Geographic coordinates of Zurich",
+        "encodingFormat": "application/json",
+        "latitude": 47.3769,
+        "longitude": 8.5417
+      }
+    },
+    {
+      "id": "ds-time",
+      "labels": ["sc:Dataset"],
+      "properties": {
+        "Name": "Current Time",
+        "Description": "Time at which temperature is requested",
+        "encodingFormat": "application/json"
+      }
+    },
+    {
+      "id": "ds-output",
+      "labels": ["sc:Dataset"],
+      "properties": {
+        "Name": "Zurich Temperature Dataset",
+        "Description": "Retrieved temperature for Zurich",
+        "encodingFormat": "application/json",
+        "unit": "celsius"
+      }
+    },
+    {
+      "id": "user-1",
+      "labels": ["User"],
+      "properties": {
+        "name": "User",
+        "personal_type": ["requester"]
+      }
+    },
+    {
+      "id": "task-1",
+      "labels": ["Task"],
+      "properties": {
+        "Name": "Retrieve Zurich Temperature",
+        "Description": "Task to retrieve the current temperature in Zurich"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "ap-1",
+      "labels": ["consist_of"],
+      "to": "op-1"
+    },
+    {
+      "from": "ds-location",
+      "labels": ["input"],
+      "properties": { "argname": "location" },
+      "to": "op-1"
+    },
+    {
+      "from": "ds-time",
+      "labels": ["input"],
+      "properties": { "argname": "time" },
+      "to": "op-1"
+    },
+    {
+      "from": "op-1",
+      "labels": ["output"],
+      "to": "ds-output"
+    },
+    {
+      "from": "task-1",
+      "labels": ["is_achieved"],
+      "to": "ap-1"
+    },
+    {
+      "from": "user-1",
+      "labels": ["request"],
+      "to": "task-1"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "nodes": [
+    {
+      "id": "ap-2",
+      "labels": ["Analytical_Pattern"],
+      "properties": {
+        "name": "Retrieve Lausanne Temperature AP",
+        "description": "Analytical Pattern to retrieve temperature data for Lausanne",
+        "process": "retrieve_temperature",
+        "publishedDate": "2025-06-30",
+        "startTime": "10:05:00"
+      }
+    },
+    {
+      "id": "op-2",
+      "labels": ["API_Operator"],
+      "properties": {
+        "Name": "Weather API Operator",
+        "Description": "Calls a weather API to retrieve temperature data",
+        "endpoint": "https://api.open-meteo.com/v1/forecast",
+        "command": "GET",
+        "queryType": "REST",
+        "Step": 1,
+        "parameters": ["latitude", "longitude", "current_weather"],
+        "PublishedDate": "2025-06-30",
+        "StartTime": "10:05:00"
+      }
+    },
+    {
+      "id": "ds-location-lausanne",
+      "labels": ["sc:Dataset"],
+      "properties": {
+        "Name": "Lausanne Location",
+        "Description": "Geographic coordinates of Lausanne",
+        "encodingFormat": "application/json",
+        "latitude": 46.5197,
+        "longitude": 6.6323
+      }
+    },
+    {
+      "id": "ds-time-lausanne",
+      "labels": ["sc:Dataset"],
+      "properties": {
+        "Name": "Current Time",
+        "Description": "Time at which temperature is requested",
+        "encodingFormat": "application/json"
+      }
+    },
+    {
+      "id": "ds-output-lausanne",
+      "labels": ["sc:Dataset"],
+      "properties": {
+        "Name": "Lausanne Temperature Dataset",
+        "Description": "Retrieved temperature for Lausanne",
+        "encodingFormat": "application/json",
+        "unit": "celsius"
+      }
+    },
+    {
+      "id": "user-1",
+      "labels": ["User"],
+      "properties": {
+        "name": "User",
+        "personal_type": ["requester"]
+      }
+    },
+    {
+      "id": "task-2",
+      "labels": ["Task"],
+      "properties": {
+        "Name": "Retrieve Lausanne Temperature",
+        "Description": "Task to retrieve the current temperature in Lausanne"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "ap-2",
+      "labels": ["consist_of"],
+      "to": "op-2"
+    },
+    {
+      "from": "ds-location-lausanne",
+      "labels": ["input"],
+      "properties": { "argname": "location" },
+      "to": "op-2"
+    },
+    {
+      "from": "ds-time-lausanne",
+      "labels": ["input"],
+      "properties": { "argname": "time" },
+      "to": "op-2"
+    },
+    {
+      "from": "op-2",
+      "labels": ["output"],
+      "to": "ds-output-lausanne"
+    },
+    {
+      "from": "task-2",
+      "labels": ["is_achieved"],
+      "to": "ap-2"
+    },
+    {
+      "from": "user-1",
+      "labels": ["request"],
+      "to": "task-2"
+    }
+  ]
+}
