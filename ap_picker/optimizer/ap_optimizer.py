@@ -12,3 +12,9 @@ class ApOptimizer(Optimizer):
         super().__init__(**kwargs)
         self.implementation_rules.extend(IMPLEMENTATION_RULES)
         self.transformation_rules.extend(TRANSFORMATION_RULES)
+        rules_to_remove = {"RAGRule"}
+        self.implementation_rules = [
+            rule for rule in self.implementation_rules
+            if rule.__name__ not in rules_to_remove
+        ]
+        print(self.implementation_rules)

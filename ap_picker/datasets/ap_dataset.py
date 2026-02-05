@@ -1,8 +1,8 @@
 from json import load
 from pathlib import Path
-from typing import List
+from typing import Any, Dict, Iterator, List
 
-from palimpzest import IterDataset
+from palimpzest import Dataset, IterDataset
 from pydantic import BaseModel
 from requests import get
 

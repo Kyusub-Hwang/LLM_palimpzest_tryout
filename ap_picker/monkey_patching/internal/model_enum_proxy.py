@@ -11,7 +11,7 @@ class ModelEnumProxy(str):
         self.model_name = model_name
 
     def is_llama_model(self):
-        return True
+        return "llama" in self.model_name.lower()
 
     def is_clip_model(self):
         return False
@@ -20,7 +20,7 @@ class ModelEnumProxy(str):
         return False
 
     def is_text_embedding_model(self):
-        return False
+        return "embed" in self.model_name.lower()
 
     def is_o_model(self):
         return False
@@ -47,7 +47,7 @@ class ModelEnumProxy(str):
         return False
 
     def is_text_model(self):
-        return True
+        return "embed" not in self.model_name.lower()
 
     def is_vision_model(self):
         return False
@@ -62,7 +62,8 @@ class ModelEnumProxy(str):
         return False
 
     def is_embedding_model(self):
-        return False
+        # NOTE: Simplified assumption based on model name
+        return "embed" in self.model_name.lower()
 
     @property
     def value(self):
