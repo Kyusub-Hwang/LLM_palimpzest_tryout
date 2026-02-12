@@ -1,0 +1,516 @@
+{
+    "code": 200,
+    "message": "Datasets retrieved successfully",
+    "datasets": [
+        {
+            "nodes": [
+                {
+                    "id": "1928a6b4-9e92-40f9-b8e3-d28553694d6d",
+                    "labels": [
+                        "sc:Dataset",
+                        "Relational_Database"
+                    ],
+                    "properties": {
+                        "name": "mathe",
+                        "description": "The mathe database",
+                        "contentUrl": "postgresql://provdemo:provdemo@postgres-provsql:5432/mathe"
+                    }
+                },
+                {
+                    "id": "f6e06696-e2ec-40f8-ab76-c21c5c97d55c",
+                    "labels": [
+                        "Table"
+                    ],
+                    "properties": {
+                        "name": "mathe.assessment",
+                        "description": "Assessment table containing student answers"
+                    }
+                },
+                {
+                    "id": "63dc1402-d353-41d2-9da0-5288cccd8e4e",
+                    "labels": [
+                        "Table"
+                    ],
+                    "properties": {
+                        "name": "mathe.platform__sna__questions",
+                        "description": "Questions table containing question metadata"
+                    }
+                },
+                {
+                    "id": "5febe203-e776-448d-8343-57240873260c",
+                    "labels": [
+                        "Table"
+                    ],
+                    "properties": {
+                        "name": "mathe.platform__topic",
+                        "description": "Topic table containing topic metadata"
+                    }
+                }
+            ],
+            "edges": [
+                {
+                    "from": "1928a6b4-9e92-40f9-b8e3-d28553694d6d",
+                    "labels": [
+                        "contain"
+                    ],
+                    "to": "f6e06696-e2ec-40f8-ab76-c21c5c97d55c"
+                },
+                {
+                    "from": "1928a6b4-9e92-40f9-b8e3-d28553694d6d",
+                    "labels": [
+                        "contain"
+                    ],
+                    "to": "63dc1402-d353-41d2-9da0-5288cccd8e4e"
+                },
+                {
+                    "from": "1928a6b4-9e92-40f9-b8e3-d28553694d6d",
+                    "labels": [
+                        "contain"
+                    ],
+                    "to": "5febe203-e776-448d-8343-57240873260c"
+                }
+            ]
+        },
+        {
+            "nodes": [
+                {
+                    "id": "056ff7ea-ac5a-4496-abc5-ad254ddf58fa",
+                    "labels": [
+                        "sc:Dataset"
+                    ],
+                    "properties": {
+                        "country": "PT",
+                        "citeAs": "",
+                        "description": "Subway data",
+                        "inLanguage": [
+                            "el"
+                        ],
+                        "type": "sc:Dataset",
+                        "version": "",
+                        "url": "",
+                        "dg:headline": "Subway data.",
+                        "dg:keywords": [
+                            "dev",
+                            "keyword"
+                        ],
+                        "datePublished": "24-05-2025",
+                        "license": "Public Domain",
+                        "dg:status": "loaded",
+                        "dg:fieldOfScience": [
+                            "CIVIL ENGINEERING"
+                        ],
+                        "name": "OASA Data",
+                        "sc:archivedAt": "s3://dataset/056ff7ea-ac5a-4496-abc5-ad254ddf58fa",
+                        "conformsTo": "",
+                        "id": "056ff7ea-ac5a-4496-abc5-ad254ddf58fa"
+                    }
+                },
+                {
+                    "id": "38d53b0e-c88f-4509-aeea-f9cfa189eab2",
+                    "labels": [
+                        "CSV",
+                        "cr:FileObject"
+                    ],
+                    "properties": {
+                        "contentUrl": "s3://dataset/056ff7ea-ac5a-4496-abc5-ad254ddf58fa/weather_data_fr.csv",
+                        "sha256": "6df8c700f8c47533c567b7b3108f8f6ddf807474260bcb576f626b72107fa3ad",
+                        "contentSize": "2407043 B",
+                        "name": "weather_data_fr.csv",
+                        "encodingFormat": "text/csv",
+                        "description": "",
+                        "id": "38d53b0e-c88f-4509-aeea-f9cfa189eab2",
+                        "type": "cr:FileObject"
+                    }
+                }
+            ],
+            "edges": [
+                {
+                    "from": "056ff7ea-ac5a-4496-abc5-ad254ddf58fa",
+                    "to": "38d53b0e-c88f-4509-aeea-f9cfa189eab2",
+                    "labels": [
+                        "distribution"
+                    ],
+                    "properties": {}
+                }
+            ]
+        },
+        {
+            "nodes": [
+                {
+                    "id": "eb87b0f3-fb8a-4a24-8234-3da28b7398a0",
+                    "labels": [
+                        "cr:RecordSet"
+                    ],
+                    "properties": {
+                        "cr:examples": "{\"\\u00ef\\u00bb\\u00bfKategorie\": [\"Amphibien\", \"Amphibien\", \"Amphibien\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Fische\", \"Reptilien\", \"Reptilien\", \"Reptilien\", \"Reptilien\", \"Reptilien\", \"Reptilien\", \"Reptilien\", \"Reptilien\", \"Reptilien\"], \"Art\": [\"Schmuckhornfrosch\", \"Rotaugenlaubfrosch\", \"Schwimmw\\u00c3\\u00bchle\", \"Trauermantelsalmler\", \"Antennenwels\", \"Schwielenwels\", \"Saugmaulwels\", \"Amerikanischer Wei\\u00c3\\u009fstirnmesserfisch\", \"Gr\\u00c3\\u00bcnflossen-Buntbarsch\", \"Saugbarbe\", \"Endlers Guppy\", \"Pfauenaugenbuntbarsch\", \"Augenfleckbuntbarsch\", \"Pfauenaugen-Stechrochen\", \"Hujeta Hechtsalmler\", \"Schmucksalmler\", \"Dickkopf-Scheibensalmler\", \"Roter Neon\", \"Roter Piranha\", \"Prachtkopfsteher\", \"Flaggenbuntbarsch\", \"\\u00c3\\u0084gyptische Landschildkr\\u00c3\\u00b6te\", \"Spornschildkr\\u00c3\\u00b6te\", \"Asiatischer Hausgekko\", \"Oman-Eidechse\", \"Kaiserboa\", \"Salvin Kreuzbrustschildkr\\u00c3\\u00b6te\", \"Waldschildkr\\u00c3\\u00b6te\", \"Stirnlappenbasilisk\", \"Streifenbasilisk\"], \"wissenschaftlicher Name\": [\"Ceratophrys cranwelli\", \"Agalychnis callidryas\", \"Typhlonectes natans\", \"Gymnocorymbus ternetzi\", \"Ancistrus spec.\", \"Leothoplosternum pectorale\", \"Hypostomus spec.\", \"Apteronotus albifrons\", \"Cichlasoma nigrofasciatum\", \"Garra spec.\", \"Poecilia wingei\", \"Astronotus oncellatus\", \"Heros severum\", \"Potamotrygon motoro\", \"Ctenolucius hujeta\", \"Hyphessobrycon rosaceus\", \"Methynis altidorsalis\", \"Paracheirodon axelrodi\", \"Pygocentrus nattereri\", \"Anostomus anostomus\", \"Mesonauta festivus\", \"Testudo kleinmanni\", \"Centrochelys sulcata\", \"Hemidactylus frenatus\", \"Omanosaura jayakari\", \"Boa imperator\", \"Staurotypus salvinii\", \"Chelonoides denticulata\", \"Basiliscus plumifrons\", \"Basiliscus vittatus\"], \"Anzahl\": [\"0\", \"0\", \"0\", \"0\", \"ca 15\", \"0\", \"0\", \"0\", \"ca 10\", \"0\", \"0\", \"0\", \"4\", \"4\", \"0\", \"0\", \"13\", \"21\", \"0\", \"1\", \"3\", \"4\", \"2\", \"15\", \"2\", \"0\", \"0\", \"0\", \"0\", \"0\"], \"Kommune\": [\"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\", \"Dortmund\"]}",
+                        "name": "zoo-2024",
+                        "id": "eb87b0f3-fb8a-4a24-8234-3da28b7398a0",
+                        "type": "cr:RecordSet"
+                    }
+                },
+                {
+                    "id": "f5234567-890a-bcde-f012-3456789abcde",
+                    "labels": [
+                        "CSV",
+                        "cr:FileObject"
+                    ],
+                    "properties": {
+                        "contentUrl": "s3://dataset/c893daaf-680f-4947-88e5-03fd61900795/zoo-metadata.csv",
+                        "sha256": "7eg9d801g9d58644568c8c8c119g9g7eeg918585371ccd687g737d73208gb4be",
+                        "contentSize": "1500000 B",
+                        "name": "zoo-metadata.csv",
+                        "description": "",
+                        "encodingFormat": "text/csv",
+                        "id": "f5234567-890a-bcde-f012-3456789abcde",
+                        "type": "cr:FileObject"
+                    }
+                },
+                {
+                    "id": "c5f7c053-4aa5-4c3f-9d7f-9a2d58a3b6e1",
+                    "labels": [
+                        "cr:Field"
+                    ],
+                    "properties": {
+                        "dataType": "sc:Text",
+                        "name": "ï»¿Kategorie",
+                        "description": "",
+                        "id": "c5f7c053-4aa5-4c3f-9d7f-9a2d58a3b6e1",
+                        "type": "cr:Field",
+                        "sample": [
+                            "SÃ¤ugetiere",
+                            "SÃ¤ugetiere",
+                            "SÃ¤ugetiere",
+                            "SÃ¤ugetiere",
+                            "VÃ¶gel",
+                            "VÃ¶gel",
+                            "Reptilien",
+                            "SÃ¤ugetiere",
+                            "VÃ¶gel",
+                            "SÃ¤ugetiere"
+                        ]
+                    }
+                },
+                {
+                    "id": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "labels": [
+                        "sc:Dataset"
+                    ],
+                    "properties": {
+                        "country": "CH",
+                        "citeAs": "",
+                        "inLanguage": [
+                            "de"
+                        ],
+                        "description": "Zoo animal species data",
+                        "type": "sc:Dataset",
+                        "version": "",
+                        "url": "",
+                        "dg:headline": "Zoo animal species data from Zurich Zoo.",
+                        "dg:keywords": [
+                            "zoo",
+                            "animals",
+                            "species"
+                        ],
+                        "datePublished": "2024-12-09",
+                        "license": "Public Domain",
+                        "dg:status": "loaded",
+                        "dg:fieldOfScience": [
+                            "BIOLOGICAL SCIENCES"
+                        ],
+                        "name": "zoo_tierarten_2024",
+                        "sc:archivedAt": "s3://dataset/c893daaf-680f-4947-88e5-03fd61900795",
+                        "conformsTo": "",
+                        "id": "c893daaf-680f-4947-88e5-03fd61900795"
+                    }
+                },
+                {
+                    "id": "883b5c9b-408a-4dd8-8619-e34e664b9920",
+                    "labels": [
+                        "CSV",
+                        "cr:FileObject"
+                    ],
+                    "properties": {
+                        "contentUrl": "s3://dataset/c893daaf-680f-4947-88e5-03fd61900795/zoo-2024.csv",
+                        "sha256": "6df8c700f8c47533c567b7b3108f8f6ddf807474260bcb576f626b72107fa3ad",
+                        "contentSize": "2407043 B",
+                        "name": "zoo-2024.csv",
+                        "description": "",
+                        "encodingFormat": "text/csv",
+                        "id": "883b5c9b-408a-4dd8-8619-e34e664b9920",
+                        "type": "cr:FileObject"
+                    }
+                }
+            ],
+            "edges": [
+                {
+                    "from": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "to": "f5234567-890a-bcde-f012-3456789abcde",
+                    "labels": [
+                        "distribution"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "to": "883b5c9b-408a-4dd8-8619-e34e664b9920",
+                    "labels": [
+                        "distribution"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c5f7c053-4aa5-4c3f-9d7f-9a2d58a3b6e1",
+                    "to": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "labels": [
+                        "source/fileObject"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c5f7c053-4aa5-4c3f-9d7f-9a2d58a3b6e1",
+                    "to": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "labels": [
+                        "source/fileObject"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "eb87b0f3-fb8a-4a24-8234-3da28b7398a0",
+                    "to": "c5f7c053-4aa5-4c3f-9d7f-9a2d58a3b6e1",
+                    "labels": [
+                        "field"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c5f7c053-4aa5-4c3f-9d7f-9a2d58a3b6e1",
+                    "to": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "labels": [
+                        "source/fileObject"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "eb87b0f3-fb8a-4a24-8234-3da28b7398a0",
+                    "to": "c5f7c053-4aa5-4c3f-9d7f-9a2d58a3b6e1",
+                    "labels": [
+                        "field"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "to": "eb87b0f3-fb8a-4a24-8234-3da28b7398a0",
+                    "labels": [
+                        "recordSet"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "to": "f5234567-890a-bcde-f012-3456789abcde",
+                    "labels": [
+                        "distribution"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c5f7c053-4aa5-4c3f-9d7f-9a2d58a3b6e1",
+                    "to": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "labels": [
+                        "source/fileObject"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "eb87b0f3-fb8a-4a24-8234-3da28b7398a0",
+                    "to": "c5f7c053-4aa5-4c3f-9d7f-9a2d58a3b6e1",
+                    "labels": [
+                        "field"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "to": "eb87b0f3-fb8a-4a24-8234-3da28b7398a0",
+                    "labels": [
+                        "recordSet"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "to": "883b5c9b-408a-4dd8-8619-e34e664b9920",
+                    "labels": [
+                        "distribution"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "to": "eb87b0f3-fb8a-4a24-8234-3da28b7398a0",
+                    "labels": [
+                        "recordSet"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "to": "eb87b0f3-fb8a-4a24-8234-3da28b7398a0",
+                    "labels": [
+                        "recordSet"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "eb87b0f3-fb8a-4a24-8234-3da28b7398a0",
+                    "to": "c5f7c053-4aa5-4c3f-9d7f-9a2d58a3b6e1",
+                    "labels": [
+                        "field"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "to": "eb87b0f3-fb8a-4a24-8234-3da28b7398a0",
+                    "labels": [
+                        "recordSet"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "eb87b0f3-fb8a-4a24-8234-3da28b7398a0",
+                    "to": "c5f7c053-4aa5-4c3f-9d7f-9a2d58a3b6e1",
+                    "labels": [
+                        "field"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c5f7c053-4aa5-4c3f-9d7f-9a2d58a3b6e1",
+                    "to": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "labels": [
+                        "source/fileObject"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "to": "f5234567-890a-bcde-f012-3456789abcde",
+                    "labels": [
+                        "distribution"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "to": "eb87b0f3-fb8a-4a24-8234-3da28b7398a0",
+                    "labels": [
+                        "recordSet"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "eb87b0f3-fb8a-4a24-8234-3da28b7398a0",
+                    "to": "c5f7c053-4aa5-4c3f-9d7f-9a2d58a3b6e1",
+                    "labels": [
+                        "field"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c5f7c053-4aa5-4c3f-9d7f-9a2d58a3b6e1",
+                    "to": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "labels": [
+                        "source/fileObject"
+                    ],
+                    "properties": {}
+                },
+                {
+                    "from": "c893daaf-680f-4947-88e5-03fd61900795",
+                    "to": "883b5c9b-408a-4dd8-8619-e34e664b9920",
+                    "labels": [
+                        "distribution"
+                    ],
+                    "properties": {}
+                }
+            ]
+        },
+        {
+            "nodes": [
+                {
+                    "id": "dfe9310a-87e3-4e42-bcf4-b65bf0c80406",
+                    "labels": [
+                        "sc:Dataset"
+                    ],
+                    "properties": {
+                        "country": "PT",
+                        "citeAs": "ca",
+                        "description": "This dataset was extracted from the MathE platform, an online educational platform developed to support mathematics teaching and learning in higher education. It contains 546 student responses to questions on several mathematical topics. Each record corresponds to an individual answer and includes the following features: Student ID, Student Country, Question ID, Type of Answer (correct or incorrect), Question Level (basic or advanced based on the assessment of the contributing professor), Math Topic (broader mathematical area of the question), Math Subtopic, and Question Keywords. The data spans from February 2019 to December 2023.",
+                        "inLanguage": [
+                            "en"
+                        ],
+                        "type": "sc:Dataset",
+                        "version": "v1.0.0",
+                        "url": "https://dados.ipb.pt//dataset.xhtml?persistentId=doi:10.34620/dadosipb/PW3OWY",
+                        "dg:headline": "Dataset for Assessing Mathematics Learning in Higher Education.",
+                        "dg:keywords": [
+                            "math",
+                            "student",
+                            "higher education"
+                        ],
+                        "datePublished": "2025-05-24",
+                        "license": "CC0 1.0",
+                        "dg:status": "loaded",
+                        "dg:fieldOfScience": [
+                            "MATHEMATICS"
+                        ],
+                        "name": "full test",
+                        "sc:archivedAt": "s3://dataset/dfe9310a-87e3-4e42-bcf4-b65bf0c80406",
+                        "conformsTo": "ct",
+                        "id": "dfe9310a-87e3-4e42-bcf4-b65bf0c80406"
+                    }
+                }
+            ],
+            "edges": []
+        },
+        {
+            "nodes": [
+                {
+                    "id": "bfca980d-e6a4-4ea5-a7d5-eb8b08fb02bb",
+                    "labels": [
+                        "sc:Dataset"
+                    ],
+                    "properties": {
+                        "country": "PT",
+                        "citeAs": "ca",
+                        "description": "This dataset was extracted from the MathE platform, an online educational platform developed to support mathematics teaching and learning in higher education. It contains 546 student responses to questions on several mathematical topics. Each record corresponds to an individual answer and includes the following features: Student ID, Student Country, Question ID, Type of Answer (correct or incorrect), Question Level (basic or advanced based on the assessment of the contributing professor), Math Topic (broader mathematical area of the question), Math Subtopic, and Question Keywords. The data spans from February 2019 to December 2023.",
+                        "inLanguage": [
+                            "en"
+                        ],
+                        "type": "sc:Dataset",
+                        "version": "v1.0.0",
+                        "url": "https://dados.ipb.pt//dataset.xhtml?persistentId=doi:10.34620/dadosipb/PW3OWY",
+                        "dg:headline": "Dataset for Assessing Mathematics Learning in Higher Education.",
+                        "dg:keywords": [
+                            "math",
+                            "student",
+                            "higher education"
+                        ],
+                        "datePublished": "2025-05-24",
+                        "license": "CC0 1.0",
+                        "dg:status": "loaded",
+                        "dg:fieldOfScience": [
+                            "MATHEMATICS"
+                        ],
+                        "name": "full test",
+                        "sc:archivedAt": "s3://dataset/bfca980d-e6a4-4ea5-a7d5-eb8b08fb02bb",
+                        "conformsTo": "ct",
+                        "id": "bfca980d-e6a4-4ea5-a7d5-eb8b08fb02bb"
+                    }
+                }
+            ],
+            "edges": []
+        }
+    ]
+}
