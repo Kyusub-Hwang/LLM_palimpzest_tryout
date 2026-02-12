@@ -1,6 +1,7 @@
 {
     "name": "Palimpzest evaluation devcontainer",
-    "image": "mcr.microsoft.com/devcontainers/python:3.13",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "devcontainer",
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
     "features": {
         "ghcr.io/devcontainers-extra/features/uv:1": {},
@@ -20,7 +21,8 @@
                 "charliermarsh.ruff",
                 "ms-python.bandit",
                 "ms-python.debugpy",
-                "yzhang.markdown-all-in-one"
+                "yzhang.markdown-all-in-one",
+                "ms-ossdata.vscode-pgsql"
             ],
             "settings": {
                 "editor.defaultFormatter": "charliermarsh.ruff",
@@ -40,6 +42,7 @@
         }
     },
     "postCreateCommand": "uv sync --all-groups",
-    "runArgs": ["--add-host=host.docker.internal:host-gateway"]
-
+    "runArgs": [
+        "--add-host=host.docker.internal:host-gateway"
+    ]
 }
