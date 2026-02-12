@@ -1,12 +1,25 @@
+import numpy as np
 import pytest
-from litellm import completion
 
-from ap_picker.planner.get_plan import (
-    Operation,
-    OperationDefinition,
-    ParameterDefinition,
-    get_logical_operations,
-)
+# from ap_picker.planner.get_plan import (
+#     Operation,
+#     OperationDefinition,
+#     ParameterDefinition,
+#     get_logical_operations,
+# )
+from litellm import completion, embedding
+
+
+def test_int_nomic_deployment():
+    response = embedding(
+        model="ollama/nomic-embed-text",
+        input=["elephants", "paper"],
+        api_base="http://host.docker.internal:11434"
+    )
+    print(response)
+    tmp = np.dot(response.data[0]['embedding'], response.data[1]['embedding'])/(np.linalg.norm(
+        response.data[0]['embedding'])*np.linalg.norm(response.data[1]['embedding']))
+    print(tmp)
 
 
 def test_int_ollama_deployment():
