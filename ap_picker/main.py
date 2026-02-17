@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 from palimpzest import Model, QueryProcessorConfig, TextFileDataset, Validator
 
 from ap_picker.custom_models import CUSTOM_MODELS_CARDS
-from ap_picker.datasets.ap_dataset import LocalApDataset
 from ap_picker.monkey_patching import add_model_support, use_custom_optimizer
 from ap_picker.optimizer.ap_optimizer import ApOptimizer
 

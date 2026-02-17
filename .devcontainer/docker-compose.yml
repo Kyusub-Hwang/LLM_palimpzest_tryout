@@ -13,6 +13,8 @@ services:
       - POSTGRES_PASSWORD=provdemo
       - POSTGRES_TIMESCALE_HOST=postgres
       - POSTGRES_TIMESCALE_PORT=5432
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       # Ensures that the databases are started before the API
       postgres:

@@ -1,0 +1,65 @@
+[
+    {
+        "nodes": [
+            {
+                "id": "056ff7ea-ac5a-4496-abc5-ad254ddf58fa",
+                "labels": [
+                    "sc:Dataset"
+                ],
+                "properties": {
+                    "country": "PT",
+                    "citeAs": "",
+                    "description": "Subway data",
+                    "inLanguage": [
+                        "el"
+                    ],
+                    "type": "sc:Dataset",
+                    "version": "",
+                    "url": "",
+                    "dg:headline": "Subway data.",
+                    "dg:keywords": [
+                        "dev",
+                        "keyword"
+                    ],
+                    "datePublished": "24-05-2025",
+                    "license": "Public Domain",
+                    "dg:status": "loaded",
+                    "dg:fieldOfScience": [
+                        "CIVIL ENGINEERING"
+                    ],
+                    "name": "OASA Data",
+                    "sc:archivedAt": "s3://dataset/056ff7ea-ac5a-4496-abc5-ad254ddf58fa",
+                    "conformsTo": "",
+                    "id": "056ff7ea-ac5a-4496-abc5-ad254ddf58fa"
+                }
+            },
+            {
+                "id": "38d53b0e-c88f-4509-aeea-f9cfa189eab2",
+                "labels": [
+                    "CSV",
+                    "cr:FileObject"
+                ],
+                "properties": {
+                    "contentUrl": "s3://dataset/056ff7ea-ac5a-4496-abc5-ad254ddf58fa/weather_data_fr.csv",
+                    "sha256": "6df8c700f8c47533c567b7b3108f8f6ddf807474260bcb576f626b72107fa3ad",
+                    "contentSize": "2407043 B",
+                    "name": "weather_data_fr.csv",
+                    "encodingFormat": "text/csv",
+                    "description": "",
+                    "id": "38d53b0e-c88f-4509-aeea-f9cfa189eab2",
+                    "type": "cr:FileObject"
+                }
+            }
+        ],
+        "edges": [
+            {
+                "from": "056ff7ea-ac5a-4496-abc5-ad254ddf58fa",
+                "to": "38d53b0e-c88f-4509-aeea-f9cfa189eab2",
+                "labels": [
+                    "distribution"
+                ],
+                "properties": {}
+            }
+        ]
+    }
+]

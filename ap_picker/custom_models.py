@@ -1,6 +1,6 @@
 from typing import Dict
 
-from monkey_patching import ModelCardLike
+from ap_picker.monkey_patching import ModelCardLike
 
 CUSTOM_MODELS_CARDS: Dict[str, ModelCardLike] = {
     "ollama/llama3.1": {
