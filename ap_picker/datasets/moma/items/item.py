@@ -6,8 +6,8 @@ from pydantic import BaseModel
 
 
 class MomaDatasetItemType(Enum):
-    RELATIONAL_DB = auto(),
-    FILE_DATASET = auto(),
+    RELATIONAL_DB = "relational_db"
+    FILE_DATASET = "file_dataset"
 
 
 class MomaDatasetItem(BaseModel, ABC):
