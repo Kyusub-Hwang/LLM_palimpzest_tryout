@@ -127,13 +127,12 @@ class DatasetLevelFilter(FilterOp):
 
         match dataset_type:
             case MomaDatasetItemType.RELATIONAL_DB:
-                return self._sql_dataset_check(candidate)
-            case MomaDatasetItemType.FILE_DATASET:
-                return self._llm_dataset_check(candidate)
+                return self._sql_filter(candidate)
             case _:
-                raise ValueError(f"Unsupported dataset type: {dataset_type}")
+                logger.warning(f"Unsupported dataset type: {dataset_type}")
+                # raise ValueError(f"Unsupported dataset type: {dataset_type}")
 
-    def _sql_dataset_check(self, candidate: DataRecord) -> tuple[dict[str, bool], GenerationStats]:
+    def _sql_filter(self, candidate: DataRecord) -> tuple[dict[str, bool], GenerationStats]:
         """
         Use SQL to check if database contains ANY records matching the filter.
         More efficient than loading all records (uses LIMIT 1).
@@ -160,19 +159,20 @@ class DatasetLevelFilter(FilterOp):
             response_format=QueryResponse,
             messages=[{
                 "role": "user",
-                "content": f"""Convert this natural language filter into a SQL query that checks if ANY record matches.
+                "content": f"""
+                Convert this natural language filter into a SQL query that filters  if ANY record matches.
 
-Database schema: {schema}
-Filter condition: {filter_condition}
+                Database schema: {schema}
+                Filter condition: {filter_condition}
 
-Requirements:
-1. Return at least one record if ANY record matches the condition
-2. Use LIMIT 1 for efficiency (we only need to know if matches exist)
-3. Use fully qualified table names with schema
-4. Return empty result if no matches
+                Requirements:
+                1. Return at least one record if ANY record matches the condition
+                2. Use LIMIT 1 for efficiency (we only need to know if matches exist)
+                3. Use fully qualified table names with schema
+                4. Return empty result if no matches
 
-Example: "Questions about algebra" -> "SELECT 1 FROM schema.questions WHERE question LIKE '%algebra%' LIMIT 1"
-"""
+                Example: "Questions about algebra" -> "SELECT 1 FROM schema.questions WHERE question LIKE '%algebra%' LIMIT 1"
+                """
             }]
         )
 
@@ -248,129 +248,6 @@ Consider the dataset description, metadata, and content information to make your
 
 
 # ============================================================================
-# RECORD-LEVEL FILTER (for expanded records from datasets)
-# ============================================================================
-
-class RecordLevelFilter(FilterOp):
-    """
-    Filters at the record level - evaluates individual records.
-    Always uses LLM to evaluate record content.
-    """
-
-    def __init__(
-        self,
-        model: Model,
-        prompt_strategy: PromptStrategy = PromptStrategy.FILTER,
-        reasoning_effort: str | None = None,
-        *args,
-        **kwargs,
-    ):
-        super().__init__(*args, **kwargs)
-        self.model = model
-        self.prompt_strategy = prompt_strategy
-        self.reasoning_effort = reasoning_effort
-        if model is not None:
-            self.generator = Generator(
-                model,
-                prompt_strategy,
-                reasoning_effort or "",  # Convert None to empty string
-                self.api_base,
-                Cardinality.ONE_TO_ONE,
-                self.desc,
-                self.verbose
-            )
-
-    def get_id_params(self):
-        id_params = super().get_id_params()
-        id_params = {
-            "filter_level": "record",
-            "model": None if self.model is None else self.model.value,
-            "prompt_strategy": None if self.prompt_strategy is None else self.prompt_strategy.value,
-            "reasoning_effort": self.reasoning_effort,
-            **id_params,
-        }
-        return id_params
-
-    def get_op_params(self):
-        op_params = super().get_op_params()
-        op_params = {
-            "model": self.model,
-            "prompt_strategy": self.prompt_strategy,
-            "reasoning_effort": self.reasoning_effort,
-            **op_params,
-        }
-        return op_params
-
-    def get_model_name(self):
-        return None if self.model is None else self.model.value
-
-    def naive_cost_estimates(self, source_op_cost_estimates: OperatorCostEstimates):
-        # Record-level filter uses LLM per record - more expensive
-        est_num_input_tokens = NAIVE_EST_NUM_INPUT_TOKENS
-        est_num_output_tokens = 1.25
-
-        time_per_record = (
-            MODEL_CARDS[self.model.value]["seconds_per_output_token"] *
-            est_num_output_tokens
-        )
-
-        cost_per_record = (
-            MODEL_CARDS[self.model.value]["usd_per_input_token"] * est_num_input_tokens +
-            MODEL_CARDS[self.model.value]["usd_per_output_token"] *
-            est_num_output_tokens
-        )
-
-        selectivity = NAIVE_EST_FILTER_SELECTIVITY
-        cardinality = selectivity * source_op_cost_estimates.cardinality
-
-        quality = MODEL_CARDS[self.model.value]["overall"] / 100.0
-
-        return OperatorCostEstimates(
-            cardinality=cardinality,
-            time_per_record=time_per_record,
-            cost_per_record=cost_per_record,
-            quality=quality,
-        )
-
-    def filter(self, candidate: DataRecord) -> tuple[dict[str, bool], GenerationStats]:
-        """Filter an individual record using LLM."""
-        if self.verbose:
-            record_dict = candidate.to_dict()
-            source_dataset = record_dict.get("source_dataset_id", "unknown")
-            print(
-                f"[RecordLevelFilter] Filtering record from dataset: {source_dataset}")
-
-        # Use the standard LLM filter
-        return self._llm_filter(candidate)
-
-    def _llm_filter(self, candidate: DataRecord) -> tuple[dict[str, bool], GenerationStats]:
-        """Apply LLM-based semantic filtering to the record."""
-        input_fields = self.get_input_fields()
-
-        gen_kwargs = {
-            "project_cols": input_fields,
-            "filter_condition": self.filter_obj.filter_condition
-        }
-
-        fields = {
-            "passed_operator": FieldInfo(
-                annotation=bool,
-                description="Whether the record passed the filter operation"
-            )
-        }
-
-        field_answers, _, generation_stats, _ = self.generator(
-            candidate, fields, **gen_kwargs
-        )
-
-        if self.verbose:
-            print(
-                f"  Result: {'PASS' if field_answers.get('passed_operator') else 'FAIL'}")
-
-        return field_answers, generation_stats
-
-
-# ============================================================================
 # RULES
 # ============================================================================
 
@@ -436,75 +313,12 @@ class DatasetLevelFilterRule(ImplementationRule):
                 "model": model,
                 "prompt_strategy": prompt_strategy,
                 "reasoning_effort": runtime_kwargs["reasoning_effort"],
+
             })
 
         return cls._perform_substitution(
             logical_expression,
             DatasetLevelFilter,
-            runtime_kwargs,
-            variable_op_kwargs
-        )
-
-
-class RecordLevelFilterRule(ImplementationRule):
-    """
-    Rule for record-level filtering on expanded MomaDataset records.
-    Matches FilteredScan on schemas with _source_dataset_id (added by expand()).
-    """
-
-    @classmethod
-    def matches_pattern(cls, logical_expression: LogicalExpression) -> bool:
-        logical_op = logical_expression.operator
-
-        # Must be a FilteredScan with semantic filter (no filter_fn)
-        if not isinstance(logical_op, FilteredScan) or logical_op.filter.filter_fn is not None:
-            return False
-
-        # Check if this is an expanded record (has source_dataset_id - no leading underscore)
-        input_field_keys = set(logical_expression.input_fields.keys())
-        field_names = {key.split('.')[-1] for key in input_field_keys}
-
-        is_expanded_record = 'source_dataset_id' in field_names
-
-        logger.debug(
-            f"RecordLevelFilterRule matches_pattern: {is_expanded_record} for {logical_expression}"
-        )
-        logger.debug(f"  Field names: {field_names}")
-
-        return is_expanded_record
-
-    @classmethod
-    def substitute(
-        cls,
-        logical_expression: LogicalExpression,
-        **runtime_kwargs
-    ):  # type: ignore
-        """Create physical plans with RecordLevelFilter."""
-        logger.debug(
-            f"Substituting RecordLevelFilterRule for {logical_expression}")
-
-        models = [
-            model for model in runtime_kwargs["available_models"]
-            if cls._model_matches_input(model, logical_expression)
-        ]
-
-        variable_op_kwargs = []
-        for model in models:
-            reasoning = use_reasoning_prompt(
-                runtime_kwargs["reasoning_effort"])
-            prompt_strategy = (
-                PromptStrategy.FILTER if reasoning
-                else PromptStrategy.FILTER_NO_REASONING
-            )
-            variable_op_kwargs.append({
-                "model": model,
-                "prompt_strategy": prompt_strategy,
-                "reasoning_effort": runtime_kwargs["reasoning_effort"],
-            })
-
-        return cls._perform_substitution(
-            logical_expression,
-            RecordLevelFilter,
             runtime_kwargs,
             variable_op_kwargs
         )

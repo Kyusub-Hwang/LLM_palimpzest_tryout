@@ -25,12 +25,29 @@ moma_dataset_schema = [
 
 class MomaDataset(IterDataset):
     items: List[MomaDatasetItem]
+    # Filter conditions to be applied during expand() (combined with AND)
+    _lazy_filters: List[str]
 
-    def __init__(self, *, path: Optional[str]):
+    def __init__(self, *, path: Optional[str] = None, items: Optional[List[MomaDatasetItem]] = None,
+                 lazy_filters: Optional[List[str]] = None):
+        """
+        Initialize MomaDataset.
+
+        Args:
+            path: Path to dataset JSON file (for loading from file)
+            items: Pre-loaded dataset items (for creating filtered instances)
+            lazy_filters: List of filter conditions to apply during expand() (combined with AND)
+        """
         super().__init__(id="moma", schema=moma_dataset_schema)
-        # TODO: add support for initization by URL
-        assert path is not None, "Path to dataset JSON file must be provided"
-        self.items = MomaDataset._from_file(path)
+
+        if path is not None:
+            self.items = MomaDataset._from_file(path)
+        elif items is not None:
+            self.items = items
+        else:
+            raise ValueError("Either 'path' or 'items' must be provided")
+
+        self._lazy_filters = lazy_filters if lazy_filters is not None else []
 
     def __len__(self) -> int:
         return len(self.items)
@@ -45,10 +62,58 @@ class MomaDataset(IterDataset):
         result['metadata'] = item.metadata
         return result
 
+    def find(self, filter_condition: str):
+        return super().sem_filter(filter_condition, depends_on=["name", "description"])
+
+    def sem_filter2(self, filter_condition: str, filter_rows_in_datasets=True):
+        """
+        Lazily filter dataset CONTENT. The filter is applied during expand().
+        This is NOT executed immediately - it returns a new MomaDataset with the filter stored.
+
+        Multiple sem_filter() calls can be chained - filters are combined with AND logic:
+            moma.sem_filter("algebra").sem_filter("basic") 
+            -> filters for records matching BOTH "algebra" AND "basic"
+
+        For relational DBs: Applies SQL WHERE clause during expansion
+        For file datasets: Could filter records during read (not yet implemented)
+
+        Args:
+            filter_condition: Natural language filter for data content
+                            (e.g., "questions about algebra")
+
+        Returns:
+            New MomaDataset instance with lazy filter added to filter list
+
+        Example:
+            >>> moma.sem_filter("questions about algebra").expand().run()
+            >>> # Filter applied when expand() is called
+
+            >>> moma.sem_filter("algebra").sem_filter("basic level").expand().run()
+            >>> # Both filters combined with AND
+        """
+        # Combine existing filters with new one
+        new_filters = self._lazy_filters + [filter_condition]
+
+        # Return new instance with updated filter list
+        return MomaDataset(
+            items=self.items,
+            lazy_filters=new_filters
+        )
+
     def expand(self):
         """
         Expand MomaDataset meta-records into individual records from each dataset.
         Wraps each record in an envelope schema with source information.
+
+        Applies any lazy filters stored via sem_filter() during expansion:
+        - Multiple filters are combined with AND logic
+        - For relational DBs: Applies SQL WHERE clause for efficient filtering
+        - For file datasets: Could filter during read (not yet implemented)
+
+        Implementation:
+        - Uses DatasetExpandConvert operator (a proper Palimpzest ConvertOp)
+        - Provides cost estimates for query optimization
+        - Integrates lazy filters into the expansion UDF
 
         Returns:
             IterDataset with envelope schema: {
@@ -70,88 +135,28 @@ class MomaDataset(IterDataset):
                 "type": Dict[str, Any], "description": "The actual record data"},
         ]
 
-        # Use flat_map to expand each dataset into records
-        return self.flat_map(
-            udf=self._expand_dataset_to_records,
-            cols=envelope_schema
+        # Import here to avoid circular dependency
+        from palimpzest.core.lib.schemas import create_schema_from_fields
+
+        from ap_picker.operators.dataset_expand import DatasetExpandConvert
+
+        # Convert envelope_schema list to Pydantic model
+        envelope_pydantic_schema = create_schema_from_fields(envelope_schema)
+
+        # Create the expand operator with lazy filters
+        # Note: We don't pass input_schema since it's set by Dataset operations
+        expand_op = DatasetExpandConvert(
+            output_schema=envelope_pydantic_schema,
+            input_schema=self.schema,
+            lazy_filters=self._lazy_filters
         )
 
-    @staticmethod
-    def _expand_dataset_to_records(meta_record: dict) -> List[dict]:
-        """
-        UDF for flat_map: Expand a single dataset meta-record into multiple records.
-
-        Args:
-            meta_record: Dictionary with keys: id, description, type, content, metadata
-
-        Returns:
-            List of envelope-wrapped records from this dataset
-        """
-        dataset_id = meta_record.get("id", "unknown")
-        description = meta_record.get("description", "")
-        dataset_type_raw = meta_record.get("type")
-
-        # Convert enum to string if needed
-        if isinstance(dataset_type_raw, MomaDatasetItemType):
-            dataset_type = dataset_type_raw
-        elif isinstance(dataset_type_raw, str):
-            # Try to parse string back to enum
-            try:
-                dataset_type = MomaDatasetItemType(dataset_type_raw)
-            except (ValueError, KeyError):
-                print(
-                    f"Warning: Invalid dataset type string '{dataset_type_raw}' for {dataset_id}, skipping")
-                return []
-        else:
-            print(f"Warning: Invalid dataset type for {dataset_id}, skipping")
-            return []
-
-        results = []
-        try:
-            # Import readers here to avoid circular imports
-            from .data_reader import RelationalDbReader
-
-            match dataset_type:
-                case MomaDatasetItemType.RELATIONAL_DB:
-                    # Get database name from metadata
-                    metadata = meta_record.get("metadata", {})
-                    db_name = metadata.get("names", [None])[0]
-                    if not db_name:
-                        print(f"Warning: No database name for {dataset_id}")
-                        return []
-
-                    reader = RelationalDbReader(db_name)
-
-                    # Stream records from the database
-                    for record in reader.read_stream():
-                        # Wrap in envelope
-                        envelope = {
-                            "source_dataset_id": dataset_id,
-                            "source_dataset_desc": description,
-                            "source_dataset_type": str(dataset_type),
-                            "record_data": record,
-                        }
-                        results.append(envelope)
-
-                case MomaDatasetItemType.FILE_DATASET:
-                    # For file datasets, we can't easily reconstruct the reader
-                    # without the full node information
-                    # Skip for now - this would need access to the original item
-                    print(
-                        f"Warning: File dataset expansion not yet fully implemented for {dataset_id}")
-                    return []
-
-                case _:
-                    print(
-                        f"Warning: Unsupported dataset type {dataset_type} for {dataset_id}")
-                    return []
-
-        except Exception as e:
-            # Log error but don't fail completely
-            print(
-                f"Warning: Failed to read records from dataset {dataset_id}: {e}")
-
-        return results
+        # Use flat_map with the expand operator's UDF
+        # This integrates with Palimpzest's pipeline and optimization
+        return self.flat_map(
+            udf=expand_op.udf,
+            cols=envelope_schema
+        )
 
     def expand_and_extract(self, fields: List[str]):
         """

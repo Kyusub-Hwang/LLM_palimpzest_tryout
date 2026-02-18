@@ -1,7 +1,7 @@
 from palimpzest.query.optimizer.rules import ImplementationRule as _ImplementationRule
 from palimpzest.query.optimizer.rules import TransformationRule as _TransformationRule
 
-from .hybrid_filter import DatasetLevelFilterRule, RecordLevelFilterRule
+from .dataset_level_filter import DatasetLevelFilterRule
 
 # NOTE : this structures mimics palimpzest's rule registration system
 # https://github.com/mitdbg/palimpzest/blob/01a7aaa8d28f220a4eaed006bbc1c87fafe076b6/src/palimpzest/query/optimizer/__init__.py#L87
@@ -9,7 +9,7 @@ from .hybrid_filter import DatasetLevelFilterRule, RecordLevelFilterRule
 
 ALL_RULES = [
     # Filters on MomaDataset meta-records (checks if dataset has matching records)
-    DatasetLevelFilterRule,
+    # DatasetLevelFilterRule,
     # Filters on expanded records (checks individual records)
     # RecordLevelFilterRule,
 ]
