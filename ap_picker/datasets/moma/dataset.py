@@ -1,5 +1,5 @@
 from json import load
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Hashable, List, Optional
 
 from palimpzest import Dataset, IterDataset
 
@@ -10,20 +10,30 @@ from .items import (
     MomaDatasetItemType,
 )
 
-
 moma_dataset_schema = [
-    {"name": "id",          "type": str,             "description": "Dataset uuidv4"},
-    {"name": "description", "type": str,             "description": "A description of the dataset"},
-    {"name": "type",        "type": str,             "description": "The type of the dataset, e.g. relational_db, file_dataset, etc."},
-    {"name": "content",     "type": Dict[str, Any], "description": "Content of the dataset, which may include tables, charts, text, etc."},
-    {"name": "metadata",    "type": Dict[str, Any], "description": "Metadata of the dataset, which may include information about the source, size, format, etc."},
+    {"name": "id",          "type": str,
+        "description": "Dataset uuidv4"},
+    {"name": "description", "type": str,
+        "description": "A description of the dataset"},
+    {"name": "type",        "type": str,
+        "description": "The type of the dataset, e.g. relational_db, file_dataset, etc."},
+    {"name": "content",     "type": Dict[str, Any],
+        "description": "Content of the dataset, which may include tables, charts, text, etc."},
+    {"name": "metadata",    "type": Dict[str, Any],
+        "description": "Metadata of the dataset, which may include information about the source, size, format, etc."},
 ]
 
 _QUERY_ENVELOPE_SCHEMA = [
-    {"name": "source_dataset_id",   "type": str,             "description": "ID of the source dataset"},
-    {"name": "source_dataset_desc", "type": str,             "description": "Description of the source dataset"},
-    {"name": "source_dataset_type", "type": str,             "description": "Type of the source dataset"},
-    {"name": "record_data",         "type": Dict[str, Any], "description": "The actual record data"},
+    {"name": "id",          "type": str,
+     "description": "Dataset uuidv4"},
+    {"name": "description", "type": str,
+        "description": "A description of the dataset"},
+    {"name": "type",        "type": str,
+        "description": "The type of the dataset, e.g. relational_db, file_dataset, etc."},
+    {"name": "content2",     "type": Dict[str, Any],
+        "description": "Content of the dataset, which may include tables, charts, text, etc."},
+    {"name": "metadata",    "type": Dict[str, Any],
+        "description": "Metadata of the dataset, which may include information about the source, size, format, etc."}
 ]
 
 
@@ -75,7 +85,8 @@ class MomaDataset(IterDataset):
         elif items is not None:
             self.items = items
         else:
-            raise ValueError("Either 'path', 'items', or '_wrapped_dataset' must be provided")
+            raise ValueError(
+                "Either 'path', 'items', or '_wrapped_dataset' must be provided")
 
         self._lazy_filters = lazy_filters if lazy_filters is not None else []
 
@@ -98,21 +109,24 @@ class MomaDataset(IterDataset):
     def __getattr__(self, name: str):
         # Delegate to the wrapped dataset in view mode.
         try:
-            wrapped: Dataset = object.__getattribute__(self, "_wrapped_dataset")
+            wrapped: Dataset = object.__getattribute__(
+                self, "_wrapped_dataset")
             return getattr(wrapped, name)
         except AttributeError:
             raise AttributeError(name)
 
     def __setattr__(self, name: str, value):
         if self._is_view():
-            wrapped: Dataset = object.__getattribute__(self, "_wrapped_dataset")
+            wrapped: Dataset = object.__getattribute__(
+                self, "_wrapped_dataset")
             setattr(wrapped, name, value)
         else:
             super().__setattr__(name, value)
 
     def __repr__(self) -> str:
         if self._is_view():
-            wrapped: Dataset = object.__getattribute__(self, "_wrapped_dataset")
+            wrapped: Dataset = object.__getattribute__(
+                self, "_wrapped_dataset")
             return f"MomaDataset(view={wrapped!r})"
         return f"MomaDataset(items={len(self.items)})"
 

@@ -13,7 +13,7 @@ DATASETS_ID_ABOUT_MATH = {
 }
 
 
-def test_int_find(sample_dataset: MomaDataset, models: TestModels):
+def test_int_find(math_db, sample_dataset: MomaDataset, models: TestModels):
     """Test dataset-level filtering with SQL on relational databases using find()."""
     avail_models = [models["llama"], models["nomic"]]
     output = (
@@ -32,12 +32,12 @@ def test_int_find(sample_dataset: MomaDataset, models: TestModels):
     assert set(output.to_df()["id"].unique()) == DATASETS_ID_ABOUT_MATH
 
 
-def test_int_search_data(sample_dataset: MomaDataset, models: TestModels):
+def test_int_search_data(math_db, sample_dataset: MomaDataset, models: TestModels):
     """Test dataset-level filtering with SQL on relational databases using find()."""
     avail_models = [models["gemma3_27b"], models["nomic"]]
     output = (
         sample_dataset
-        .query_data("Find the questions with level 'Basic' and topic 'Integration'")
+        .query_data("Find 5 questions with level 'Basic' and topic 'Integration'")
         .run(
             max_quality=True,
             config=QueryProcessorConfig(
@@ -50,12 +50,12 @@ def test_int_search_data(sample_dataset: MomaDataset, models: TestModels):
     assert len(output) > 0
 
 
-def test_int_search_data_map(sample_dataset: MomaDataset, models: TestModels):
+def test_int_search_data_map(math_db, sample_dataset: MomaDataset, models: TestModels):
     """Test dataset-level filtering with SQL on relational databases using find()."""
     avail_models = [models["llama"], models["nomic"]]
     output = (
         sample_dataset
-        .query_data("Find the questions with level basic and topic algebra")
+        .query_data("Find 5 questions with level basic and topic algebra")
         .sem_map(
             cols=[
                 {"name": "girls name", "type": str,
@@ -77,13 +77,13 @@ def test_int_search_data_map(sample_dataset: MomaDataset, models: TestModels):
     assert len(output) > 0
 
 
-def test_int_find_search_data(sample_dataset: MomaDataset, models: TestModels):
+def test_int_find_search_data(math_db, sample_dataset: MomaDataset, models: TestModels):
     """Test dataset-level filtering with SQL on relational databases using find()."""
     avail_models = [models["gemma3_27b"], models["nomic"]]
     output = (
         sample_dataset
         .find("Dataset about math")
-        .query_data("Find the questions with level 'Basic' and topic 'Integration'")
+        .query_data("Find 5 questions with level 'Basic' and topic 'Integration'")
         .sem_map([
             {"name": "question_id", "type": str, "description": "Id of the question"},  # noqa
             {"name": "topic", "type": str, "description": "Which field of mathematics the question is about"},  # noqa

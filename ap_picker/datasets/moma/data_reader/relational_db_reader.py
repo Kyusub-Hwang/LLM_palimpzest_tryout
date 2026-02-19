@@ -7,9 +7,8 @@ from psycopg.sql import SQL
 class RelationalDbReader:
     """Reader for streaming data from relational databases."""
 
-    def __init__(self, db_name: str):
-        # TODO: Remove harcode
-        self.connection_url = f"postgresql://provdemo:provdemo@postgres:5432/{db_name}"
+    def __init__(self, connection_string: str):
+        self.connection_string = connection_string
 
     def read_stream(self, query: Optional[str] = None, batch_size: int = 1000) -> Iterator[Dict[str, Any]]:
         """
@@ -21,7 +20,7 @@ class RelationalDbReader:
         """
         assert query is not None, "Query must be provided for relational database reader"
 
-        with connect(self.connection_url) as conn:
+        with connect(self.connection_string) as conn:
             with conn.cursor() as cur:
                 # NOTE: This executes user-provided queries, this serice MUST
                 # only have read-only rights
@@ -40,7 +39,7 @@ class RelationalDbReader:
 
     def get_schema(self) -> Dict[str, Any]:
         """Get schema information from the database, including foreign keys."""
-        with connect(self.connection_url) as conn:
+        with connect(self.connection_string) as conn:
             dump = {}
 
             with conn.cursor() as cur:

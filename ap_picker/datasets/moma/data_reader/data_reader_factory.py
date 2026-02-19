@@ -1,3 +1,4 @@
+from os import environ
 from typing import Any, Dict, Hashable, Self, Tuple, TypeGuard
 
 from ap_picker.datasets.moma.items.item import MomaDatasetItemType, MomaDatasetMetadata
@@ -25,9 +26,17 @@ class DataReaderFactory:
 
         match type_raw:
             case MomaDatasetItemType.RELATIONAL_DB.value:
+                # Get the connection details from the environment variables and metadata
+                host = environ.get("POSTGRES_HOST")
+                port = environ.get("POSTGRES_PORT")
+                user = environ.get("POSTGRES_USER")
+                password = environ.get("POSTGRES_PASSWORD")
+                assert host and port and user and password, "Database connection details are not fully set in environment variables"
                 db_name = metadata.get("names", [None])[0]
                 assert db_name is not None, "Expected database name in metadata"
-                return RelationalDbReader(db_name), MomaDatasetItemType.RELATIONAL_DB
+
+                qs = f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
+                return RelationalDbReader(qs), MomaDatasetItemType.RELATIONAL_DB
             case _:
                 raise ValueError(f"Unsupported data reader type: {type_raw}")
 

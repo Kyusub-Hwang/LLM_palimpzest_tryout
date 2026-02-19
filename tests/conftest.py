@@ -1,10 +1,12 @@
 import logging
+from os import environ
 from pathlib import Path
 from typing import TypedDict
 
 import pytest
 from dotenv import load_dotenv
 from palimpzest import Model
+from testcontainers.postgres import PostgresContainer
 
 from ap_picker.custom_models import CUSTOM_MODELS_CARDS
 from ap_picker.datasets.moma.dataset import MomaDataset
@@ -64,3 +66,21 @@ def custom_optimizer():
 @pytest.fixture(scope="session")
 def sample_dataset(asset_path: Path) -> MomaDataset:
     return MomaDataset(path=str(asset_path / "moma_datasets" / "mixed_items.json"))
+
+
+@pytest.fixture(scope="session")
+def math_db(asset_path: Path):
+    init_file = asset_path / "postgres-seed" / "01_mathe_pgsql.sql"
+    assert init_file.exists(), f"Init file {init_file} does not exist"
+
+    with PostgresContainer("postgres:17").with_volume_mapping(str(init_file), "/docker-entrypoint-initdb.d/init.sql") as postgres:
+        environ.update({
+            "POSTGRES_HOST": postgres.get_container_host_ip(),
+            "POSTGRES_PORT": str(postgres.get_exposed_port(5432)),
+            "POSTGRES_USER": postgres.username,
+            "POSTGRES_PASSWORD": postgres.password,
+            "POSTGRES_TIMESCALE_HOST": postgres.get_container_host_ip(),
+            "POSTGRES_TIMESCALE_PORT": str(postgres.get_exposed_port(5432)),
+        })
+
+        yield postgres

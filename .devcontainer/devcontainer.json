@@ -5,9 +5,12 @@
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
     "features": {
         "ghcr.io/devcontainers-extra/features/uv:1": {},
-        "ghcr.io/devcontainers-extra/features/ruff:1": {},
+        "ghcr.io/devcontainers-extra/features/ruff:2": {},
         "ghcr.io/devcontainers-extra/features/apt-get-packages:1": {
-            "packages": "python3-dev"
+            "packages": "python3-dev, postgresql-client"
+        },
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "moby": false
         }
     },
     "customizations": {
@@ -41,7 +44,7 @@
             }
         }
     },
-    "postCreateCommand": "uv sync --all-groups",
+    "postCreateCommand": "bash .devcontainer/post-create.sh",
     "runArgs": [
         "--add-host=host.docker.internal:host-gateway"
     ]

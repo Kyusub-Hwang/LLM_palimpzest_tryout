@@ -1,35 +1,22 @@
 import logging
 import time
-from typing import Any, Dict, Hashable, cast
+from typing import Any, Dict, Hashable, List, cast
 
 from litellm import Choices, ModelResponse
 from litellm import completion as litellm_completion
 from orjson import dumps
-from palimpzest.constants import (
-    MODEL_CARDS,
-    NAIVE_EST_FILTER_SELECTIVITY,
-    NAIVE_EST_NUM_INPUT_TOKENS,
-    Cardinality,
-    Model,
-    PromptStrategy,
-)
+from palimpzest.constants import MODEL_CARDS, PromptStrategy
 from palimpzest.core.elements.records import DataRecord
 from palimpzest.core.models import GenerationStats
 from palimpzest.query.operators.convert import LLMConvert
 from palimpzest.query.operators.logical import ConvertScan
-from palimpzest.query.operators.physical import PhysicalOperator
-from palimpzest.query.optimizer.primitives import (
-    Expression,
-    Group,
-    LogicalExpression,
-    PhysicalExpression,
-)
+from palimpzest.query.optimizer.primitives import LogicalExpression, PhysicalExpression
 from palimpzest.query.optimizer.rules import ImplementationRule
 from palimpzest.utils.model_helpers import use_reasoning_prompt
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
 
-from ap_picker.datasets.moma.data_reader import DataReaderFactory, RelationalDbReader
+from ap_picker.datasets.moma.data_reader import DataReaderFactory
 from ap_picker.datasets.moma.data_reader.data_reader import DataReader
 from ap_picker.datasets.moma.items.item import MomaDatasetItemType
 
@@ -45,39 +32,51 @@ class LLMMetaDatasetExpansion(LLMConvert):
 
     def convert(self, candidate: DataRecord, fields: dict[str, FieldInfo]) -> tuple[dict[str, list], GenerationStats]:
 
-        # get the set of input fields to use for the convert operation
-        input_fields = self.get_input_fields()
-
         # NOTE: This is kind of a hack - The filter condition is pulled from the map desc
         # TODO: Try to refactor into a filter/map approach
         filter_condition = self.desc
         assert filter_condition is not None, "Filter condition (desc) is required for LLMMetaDatasetExpansion"
+
         record = candidate.to_dict()
         try:
             reader, item_type = DataReaderFactory.create(record)
         except ValueError as e:
             logger.warning(
                 f"Failed to create data reader for candidate {candidate}: {e}")
-            return self.empty_return_data(), GenerationStats()
+            return self._format_output(fields, candidate.to_dict(), []), GenerationStats()
 
         if self.verbose:
             logger.info(f"Filtering dataset: {candidate.get('id', 'unknown')}")
 
+        records = []
         match item_type:
             case MomaDatasetItemType.RELATIONAL_DB:
-                return self._sql_filter(record, filter_condition, reader)
+                records, stats = self._sql_filter(filter_condition, reader)
             case _:
                 logger.warning(f"Unsupported dataset type: {item_type}")
-                return self.empty_return_data(), GenerationStats()
+                records, stats = [], GenerationStats()
 
-    def _sql_filter(self, record: Dict[Hashable, Any], filter_condition: str, reader: DataReader) -> tuple[dict[str, Any], GenerationStats]:
+        return self._format_output(fields, candidate.to_dict(), records), stats
+
+    def _sql_filter(self, filter_condition: str, reader: DataReader) -> tuple[List[Any], GenerationStats]:
         """
-        Use SQL to check if database contains ANY records matching the filter.
-        More efficient than loading all records (uses LIMIT 1).
+        Use the LLM to convert the natural language filter condition into a SQL query, 
+        then execute the query using the provided data reader and return the results.
+
+        Args:
+            record: The dataset record to filter, used to create the data reader
+            filter_condition: The natural language filter condition to convert into SQL
+            reader: A DataReader instance to execute the SQL query against
+
+        Returns:
+            A tuple of (data, GenerationStats) where data is a list of dictionaries containing the query results
         """
         start_time = time.time()
-        schema = reader.get_schema()
 
+        # #######################################
+        # Generate the SQL query using the LLM
+        #########################################
+        schema = reader.get_schema()
         # NOTE: We can use cast here because Streaming is disabled, so the response will be a ModelReponse, not a stream
         response = cast(ModelResponse, litellm_completion(
             model=self.model.value,
@@ -97,46 +96,94 @@ class LLMMetaDatasetExpansion(LLMConvert):
                 """
             }]
         ))
+        llm_call_duration_secs = time.time() - start_time
+
         raw_payload = cast(Choices, response.choices[0]).message.content
         if raw_payload is None:
             logger.error("LLM did not return any content")
-            return {"passed_operator": False}, GenerationStats(fn_call_duration_secs=time.time() - start_time)
+            return [], GenerationStats(
+                model_name=self.model.value,
+                llm_call_duration_secs=llm_call_duration_secs,
+                total_llm_calls=1,
+            )
 
         query = QueryResponse.model_validate_json(raw_payload).query
 
+        #########################################
+        # Execute the SQL query and check if any records match
+        #########################################
+        fn_start_time = time.time()
+        data = []
         try:
-            rows = reader.read_stream(query=query)
-            data = []
-            for i, row in enumerate(rows):
-                logger.debug(f"SQL query returned row: {row}")
-                data.append(dumps(row).decode("utf-8"))
-                if i >= 5:  # limit to 5 rows for efficiency
-                    break
-            # return_data = {
-            #     "source_dataset_id": [candidate.get("id")],
-            #     "source_dataset_desc": [candidate.get("description")],
-            #     "source_dataset_type": [candidate.get("type")],
-            #     "record_data": data,
-            # }
-            return_data = {
-                "source_dataset_id": [record.get("id")],
-                "source_dataset_desc": [record.get("description")],
-                "source_dataset_type": [record.get("type")],
-                "record_data": data,
-            }
-
+            data = [
+                dumps(row).decode("utf-8") for row in reader.read_stream(query=query)
+            ]
         except Exception as e:
+            data = []
             logger.error(f"SQL query failed: {e}")
-            return_data = self.empty_return_data()
-        return return_data, GenerationStats(fn_call_duration_secs=time.time() - start_time)
+        fn_call_duration_secs = time.time() - fn_start_time
 
-    def empty_return_data(self):
+        stats = self._build_generation_stats(
+            usage=response["usage"].model_dump(),
+            llm_call_duration_secs=llm_call_duration_secs,
+            fn_call_duration_secs=fn_call_duration_secs,
+        )
+
+        return data, stats
+
+    def _build_generation_stats(
+        self,
+        usage: Dict[str, Any],
+        llm_call_duration_secs: float,
+        fn_call_duration_secs: float,
+    ) -> GenerationStats:
+        """Build a GenerationStats object from a litellm ModelResponse."""
+        model_card = MODEL_CARDS.get(self.model.value, {})
+        usd_per_input_token = model_card.get("usd_per_input_token", 0.0)
+        usd_per_output_token = model_card.get("usd_per_output_token", 0.0)
+
+        input_text_tokens = usage.get("prompt_tokens", 0)
+        output_tokens = usage.get("completion_tokens", 0)
+        total_input_cost = input_text_tokens * usd_per_input_token
+        total_output_cost = output_tokens * usd_per_output_token
+
+        return GenerationStats(
+            model_name=self.model.value,
+            llm_call_duration_secs=llm_call_duration_secs,
+            fn_call_duration_secs=fn_call_duration_secs,
+            input_text_tokens=input_text_tokens,
+            total_input_tokens=input_text_tokens,
+            total_output_tokens=output_tokens,
+            total_input_cost=total_input_cost,
+            total_output_cost=total_output_cost,
+            cost_per_record=total_input_cost + total_output_cost,
+            total_llm_calls=1,
+        )
+
+    def _format_output(self, fields: dict[str, FieldInfo], record: Dict[Hashable, Any], records: List[Dict[str, Any]] = []) -> dict[str, list]:
+        """
+        Match the output of the operator to the expected output schema
+        Args:
+            fields: The expected output fields and their types
+            record: The original dataset record being filtered, used to populate the output fields
+            records: The list of records matching the filter condition, to be included in the output
+        Returns:
+            A dictionary matching the expected output schema, with the filtered records included
+        """
+        data = {}
+        for field_name in fields:
+            short_name = field_name.split(".")[-1]
+            data[short_name] = [record.get(short_name)]
+
+        data["content"] = records
         return {
-            "source_dataset_id": [],
-            "source_dataset_desc": [],
-            "source_dataset_type": [],
-            "record_data": [],
+            "id": [record.get("id")],
+            "type": [record.get("type")],
+            "description": [record.get("description")],
+            "metadata": [record.get("metadata")],
+            "content2": records
         }
+        return data
 
 
 class LLMMetaDatasetExpansionRule(ImplementationRule):

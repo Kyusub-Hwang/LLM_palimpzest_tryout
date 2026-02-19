@@ -14,16 +14,6 @@ class MomaDatasetItemRelationalDb(MomaDatasetItem):
             properties=properties
         )
 
-    def get_reader(self) -> DataReader:
-        """
-        Get a reader for streaming data from this database.
-
-        Returns:
-            DataReader: Reader instance for streaming access
-        """
-        qs = "postgresql://provdemo:provdemo@postgres:5432/mathe"
-        return RelationalDbReader(qs)
-
     @property
     def metadata(self) -> MomaDatasetMetadata:
         return {
@@ -32,6 +22,4 @@ class MomaDatasetItemRelationalDb(MomaDatasetItem):
 
     @property
     def content(self) -> Dict[str, Any]:
-        return {
-            "tables": self.properties.get("tables", [])
-        }
+        return self.properties
