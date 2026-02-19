@@ -21,6 +21,7 @@ class TestModels(TypedDict):
     nomic: Model
     llama: Model
     qwen: Model
+    gemma3_27b: Model
 
 
 @pytest.fixture(scope="session")
@@ -44,6 +45,8 @@ def models() -> TestModels:
                 models["llama"] = Model[alias]  # type: ignore
             case "ollama/qwen3":
                 models["qwen"] = Model[alias]  # type: ignore
+            case "ollama/gemma3:27b":
+                models["gemma3_27b"] = Model[alias]  # type: ignore
             case _:
                 logger.warning(
                     f"Model {model_name} was added with alias {alias}, but no matching case was found to add it to the models fixture."

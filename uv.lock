@@ -118,6 +118,7 @@ source = { editable = "." }
 dependencies = [
     { name = "dotenv" },
     { name = "litellm" },
+    { name = "orjson" },
     { name = "palimpzest" },
     { name = "psycopg", extra = ["binary"] },
     { name = "pydantic" },
@@ -139,6 +140,7 @@ dev = [
 requires-dist = [
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "litellm", specifier = ">=1.81.6" },
+    { name = "orjson", specifier = ">=3.11.6" },
     { name = "palimpzest", git = "https://github.com/SoTrx/palimpzest.git?rev=feat%2Fuse-litellm-for-embedding" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.3.2" },
     { name = "pydantic", specifier = ">=2.12.5" },

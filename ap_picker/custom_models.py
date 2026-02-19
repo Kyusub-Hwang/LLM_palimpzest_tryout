@@ -15,6 +15,12 @@ CUSTOM_MODELS_CARDS: Dict[str, ModelCardLike] = {
         "seconds_per_output_token": 0.1000,
         "overall": 66.25,
     },
+    "ollama/gemma3:27b": {
+        "usd_per_input_token": 0.18 / 1e6,
+        "usd_per_output_token": 0.18 / 1e6,
+        "seconds_per_output_token": 0.2200,
+        "overall": 80.25,
+    },
     "ollama/nomic-embed-text": {
         ##### Cost in USD #####
         "usd_per_input_token": 0.02 / 1e6,

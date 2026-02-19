@@ -1,6 +1,7 @@
 from palimpzest.query.optimizer.rules import ImplementationRule as _ImplementationRule
 from palimpzest.query.optimizer.rules import TransformationRule as _TransformationRule
 
+from .dataset_expansion import LLMMetaDatasetExpansionRule
 from .dataset_level_filter import DatasetLevelFilterRule
 
 # NOTE : this structures mimics palimpzest's rule registration system
@@ -8,6 +9,7 @@ from .dataset_level_filter import DatasetLevelFilterRule
 # This is to allow easier integration of custom rules if a fork of palimpzest is used
 
 ALL_RULES = [
+    LLMMetaDatasetExpansionRule,
     # Filters on MomaDataset meta-records (checks if dataset has matching records)
     # DatasetLevelFilterRule,
     # Filters on expanded records (checks individual records)

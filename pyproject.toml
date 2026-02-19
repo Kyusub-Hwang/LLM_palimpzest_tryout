@@ -18,6 +18,7 @@ classifiers = [
 dependencies = [
     "dotenv>=0.9.9",
     "litellm>=1.81.6",
+    "orjson>=3.11.6",
     "palimpzest @ git+https://github.com/SoTrx/palimpzest.git@feat/use-litellm-for-embedding#egg=palimpzest",
     "psycopg[binary]>=3.3.2",
     "pydantic>=2.12.5",

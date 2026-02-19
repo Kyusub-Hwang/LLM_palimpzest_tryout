@@ -1,13 +1,16 @@
-from typing import Any, Dict, Iterator, Protocol, runtime_checkable
+from typing import Any, Dict, Iterator, Optional, Protocol, runtime_checkable
 
 
 @runtime_checkable
 class DataReader(Protocol):
-    """Protocol for streaming data access from various sources."""
+    """Interface to access Data for various sources (e.g. relational databases, file datasets, etc.) in a streaming manner."""
 
-    def read_stream(self) -> Iterator[Dict[str, Any]]:
+    def read_stream(self, query: Optional[str] = None) -> Iterator[Dict[str, Any]]:
         """
         Yields rows/records as dictionaries in a streaming manner.
+
+        Args:
+            query: Filter query depending on the data type
 
         Returns:
             Iterator[Dict[str, Any]]: Stream of data rows
@@ -22,7 +25,3 @@ class DataReader(Protocol):
             Dict[str, Any]: Schema metadata (columns, types, etc.)
         """
         ...
-
-
-
-

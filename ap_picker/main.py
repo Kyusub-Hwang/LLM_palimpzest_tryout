@@ -15,37 +15,6 @@ logging.basicConfig(level=logging.DEBUG)
 load_dotenv()
 
 
-def email_sample(model: Model):
-
-    emails = TextFileDataset(
-        id="enron-emails", path="/workspaces/test/assets/emails")
-
-    # filter for emails matching natural language criteria
-    emails = emails.sem_filter(
-        'The email refers to one of the following business transactions: "Robotrader")',
-    )
-    # emails = emails.sem_filter(
-    #     "The email contains a first-hand discussion of the business transaction",
-    # )
-
-    # extract structured fields for each email
-    emails = emails.sem_map([
-        {"name": "subject", "type": str, "desc": "the subject of the email"},
-        {"name": "sender", "type": str, "desc": "the email address of the sender"},
-        {"name": "summary", "type": str, "desc": "a brief summary of the email"},
-    ])
-    valid = Validator(model=model)
-    # execute the program and print the output
-    # output = emails.optimize_and_run(max_quality=True, config=QueryProcessorConfig(
-    #     available_models=[model]), execution_strategy="parallel", validator=valid, output_schema={"filename": str, "sender": str, "subject": str, "summary": str})
-
-    output = emails.run(max_quality=True, config=QueryProcessorConfig(
-        # available_models=[model, Model.NOMIC_EMBED_TEXT]), execution_strategy="parallel", output_schema={"filename": str, "sender": str, "subject": str, "summary": str})
-        available_models=[model, Model.NOMIC_EMBED_TEXT]))
-
-    print(output.to_df(cols=["filename", "sender", "subject", "summary"]))
-
-
 def main():
 
     # Load all custom models
@@ -75,8 +44,6 @@ def main():
     #     )
     # )
     # print(output.to_df())
-
-    email_sample(model=llama)
 
 
 if __name__ == "__main__":

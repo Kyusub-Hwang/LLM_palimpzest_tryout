@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
 from ..data_reader import DataReader, RelationalDbReader
-from .item import MomaDatasetItem, MomaDatasetItemType
+from .item import MomaDatasetItem, MomaDatasetItemType, MomaDatasetMetadata
 
 
 class MomaDatasetItemRelationalDb(MomaDatasetItem):
@@ -25,7 +25,7 @@ class MomaDatasetItemRelationalDb(MomaDatasetItem):
         return RelationalDbReader(qs)
 
     @property
-    def metadata(self) -> Dict[str, Any]:
+    def metadata(self) -> MomaDatasetMetadata:
         return {
             "names": [self.properties.get("name", "")]
         }

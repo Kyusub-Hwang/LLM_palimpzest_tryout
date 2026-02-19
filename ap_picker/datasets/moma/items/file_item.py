@@ -4,7 +4,7 @@ from pydantic import PrivateAttr
 
 from ap_picker.datasets.moma.data_reader import DataReader, FileReader
 
-from .item import MomaDatasetItem, MomaDatasetItemType
+from .item import MomaDatasetItem, MomaDatasetItemType, MomaDatasetMetadata
 
 
 class MomaDatasetItemFile(MomaDatasetItem):
@@ -75,7 +75,7 @@ class MomaDatasetItemFile(MomaDatasetItem):
         }
 
     @property
-    def metadata(self) -> Dict[str, Any]:
+    def metadata(self) -> MomaDatasetMetadata:
         # Extract file names from nodes with 'cr:FileObject' label
         file_names = []
         for node in self._raw_nodes:
